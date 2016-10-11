@@ -1,6 +1,7 @@
 import exceptions.BillingoException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -142,19 +143,20 @@ public class RequestBuilder {
     }
 
     public String generateAuthHeader() throws NoSuchAlgorithmException {
+        String secret = new String(Base64.encodeBase64(privateKey.getBytes() ));
         Long time = System.currentTimeMillis() / 1000;
         String iss = requesterUrl;
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("sub", publicKey);
         map.put("iat", time.toString());
         map.put("exp", ((Long) (time + leeway)).toString());
         map.put("iss", iss);
         map.put("nbf", ((Long) (time - leeway)).toString());
         map.put("jti", MD5(publicKey + (time.toString())));
-        return Jwts.builder()
-            .setPayload(Json.toJson(map).toString())
-            .signWith(SignatureAlgorithm.HS256, privateKey)
-            .compact();
+        return Jwts.builder().setHeaderParam("typ", "JWT")
+                .setClaims(map)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     // http://stackoverflow.com/a/6565597
