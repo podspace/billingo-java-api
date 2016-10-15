@@ -1,9 +1,10 @@
 package hu.billingo.models;
 
-public class APIResponseSingle<T> implements ApiResponseWithStatus{
+/**
+ * Created by torcsi on 15/10/2016.
+ */
+public class APIResponseStatusOnly implements ApiResponseWithStatus {
     public String success;
-    public String type;
-    public T data;
     public String error;
 
     public String getSuccess() {

@@ -1,6 +1,9 @@
 package hu.billingo;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import hu.billingo.exceptions.BillingoException;
+import hu.billingo.models.APIResponseStatusOnly;
+import hu.billingo.models.ApiResponseWithStatus;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.binary.Base64;
@@ -34,7 +37,7 @@ public class RequestBuilder {
         this.requesterUrl = requesterUrl;
     }
 
-    public String get(String url) throws BillingoException {
+    public <A extends ApiResponseWithStatus> A get(String url, TypeReference<A> var1) throws BillingoException {
         try {
             HttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(baseUrl + url);
@@ -42,16 +45,10 @@ public class RequestBuilder {
             get.setHeader("Authorization", "Bearer " + generateAuthHeader());
 
             HttpResponse response = client.execute(get);
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            StringBuilder result = new StringBuilder();
-            String line = "";
-            while((line = rd.readLine()) != null) {
-                result.append(line);
-            }
-
-            return result.toString();
+            StringBuilder result = getResponseAsStringBuilder(response);
+            A retval = Json.fromJson(result.toString(), var1);
+            checkResponseObject((A) retval);
+            return retval;
         } catch(NoSuchAlgorithmException e) {
             throw new BillingoException("Billingo request exception! ", e);
         } catch(ClientProtocolException e) {
@@ -61,7 +58,18 @@ public class RequestBuilder {
         }
     }
 
-    public String post(String url, String body) throws BillingoException {
+    private StringBuilder getResponseAsStringBuilder(HttpResponse response) throws IOException {
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuilder result = new StringBuilder();
+        String line = "";
+        while((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        return result;
+    }
+
+    public <A extends ApiResponseWithStatus> A post(String url, String body, TypeReference<A> var1) throws BillingoException {
         try {
             HttpClient client = HttpClients.createDefault();
             HttpPost post = new HttpPost(baseUrl + url);
@@ -70,16 +78,10 @@ public class RequestBuilder {
             post.setEntity(new ByteArrayEntity(body.getBytes()));
 
             HttpResponse response = client.execute(post);
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            StringBuilder result = new StringBuilder();
-            String line = "";
-            while((line = rd.readLine()) != null) {
-                result.append(line);
-            }
-
-            return result.toString();
+            StringBuilder result = getResponseAsStringBuilder(response);
+            A retval = Json.fromJson(result.toString(), var1);
+            checkResponseObject(retval);
+            return retval;
         } catch(NoSuchAlgorithmException e) {
             throw new BillingoException("Billingo request exception! ", e);
         } catch(ClientProtocolException e) {
@@ -89,7 +91,13 @@ public class RequestBuilder {
         }
     }
 
-    public String put(String url, String body) throws BillingoException {
+    private <A extends ApiResponseWithStatus> void checkResponseObject(A retval) throws BillingoException {
+        if(!retval.getSuccess().equalsIgnoreCase("true")) {
+            throw new BillingoException("Billingo request status not success! The error msg is: " + retval.getError());
+        }
+    }
+
+    public <A extends ApiResponseWithStatus> A put(String url, String body, TypeReference<A> var1) throws BillingoException {
         try {
             HttpClient client = HttpClients.createDefault();
             HttpPut put = new HttpPut(baseUrl + url);
@@ -98,16 +106,10 @@ public class RequestBuilder {
             put.setEntity(new ByteArrayEntity(body.getBytes()));
 
             HttpResponse response = client.execute(put);
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            StringBuilder result = new StringBuilder();
-            String line = "";
-            while((line = rd.readLine()) != null) {
-                result.append(line);
-            }
-
-            return result.toString();
+            StringBuilder result = getResponseAsStringBuilder(response);
+            A retval = Json.fromJson(result.toString(), var1);
+            checkResponseObject((A) retval);
+            return retval;
         } catch(NoSuchAlgorithmException e) {
             throw new BillingoException("Billingo request exception! ", e);
         } catch(ClientProtocolException e) {
@@ -117,24 +119,17 @@ public class RequestBuilder {
         }
     }
 
-    public String delete(String url) throws BillingoException {
+    public void delete(String url) throws BillingoException {
         try {
             HttpClient client = HttpClients.createDefault();
             HttpDelete delete = new HttpDelete(baseUrl + url);
 
             delete.setHeader("Authorization", "Bearer " + generateAuthHeader());
-
             HttpResponse response = client.execute(delete);
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            StringBuilder result = new StringBuilder();
-            String line = "";
-            while((line = rd.readLine()) != null) {
-                result.append(line);
-            }
-
-            return result.toString();
+            StringBuilder result = getResponseAsStringBuilder(response);
+            APIResponseStatusOnly status = Json.fromJson(result.toString(), new TypeReference<APIResponseStatusOnly>() {
+            });
+            checkResponseObject(status);
         } catch(NoSuchAlgorithmException e) {
             throw new BillingoException("Billingo request exception! ", e);
         } catch(ClientProtocolException e) {
@@ -145,7 +140,7 @@ public class RequestBuilder {
     }
 
     public String generateAuthHeader() throws NoSuchAlgorithmException {
-        String secret = new String(Base64.encodeBase64(privateKey.getBytes() ));
+        String secret = new String(Base64.encodeBase64(privateKey.getBytes()));
         Long time = System.currentTimeMillis() / 1000;
         String iss = requesterUrl;
         HashMap<String, Object> map = new HashMap<String, Object>();
@@ -156,9 +151,9 @@ public class RequestBuilder {
         map.put("nbf", ((Long) (time - leeway)).toString());
         map.put("jti", MD5(publicKey + (time.toString())));
         return Jwts.builder().setHeaderParam("typ", "JWT")
-                .setClaims(map)
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+            .setClaims(map)
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact();
     }
 
     // http://stackoverflow.com/a/6565597
