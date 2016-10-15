@@ -1,4 +1,6 @@
-import exceptions.BillingoException;
+package hu.billingo;
+
+import hu.billingo.exceptions.BillingoException;
 
 
 public class MainClass {

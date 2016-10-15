@@ -1,4 +1,4 @@
-package exceptions;
+package hu.billingo.exceptions;
 
 
 public class BillingoException extends Exception {

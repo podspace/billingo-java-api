@@ -1,4 +1,4 @@
-package models;
+package hu.billingo.models;
 
 import java.util.List;
 

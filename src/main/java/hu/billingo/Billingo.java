@@ -1,6 +1,8 @@
+package hu.billingo;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import exceptions.BillingoException;
-import models.*;
+import hu.billingo.exceptions.BillingoException;
+import hu.billingo.models.*;
 
 import java.util.List;
 

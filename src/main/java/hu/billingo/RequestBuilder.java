@@ -1,4 +1,6 @@
-import exceptions.BillingoException;
+package hu.billingo;
+
+import hu.billingo.exceptions.BillingoException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.binary.Base64;

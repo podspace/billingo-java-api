@@ -1,4 +1,4 @@
-package models;
+package hu.billingo.models;
 
 public class APIResponseSingle<T> {
     public String success;

@@ -1,5 +1,5 @@
 
-package models;
+package hu.billingo.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
