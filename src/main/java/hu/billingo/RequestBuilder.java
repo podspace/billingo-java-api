@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
@@ -75,7 +75,8 @@ public class RequestBuilder {
             HttpPost post = new HttpPost(baseUrl + url);
 
             post.setHeader("Authorization", "Bearer " + generateAuthHeader());
-            post.setEntity(new ByteArrayEntity(body.getBytes()));
+            post.addHeader("content-type", "application/json");
+            post.setEntity(new StringEntity(body));
 
             HttpResponse response = client.execute(post);
             StringBuilder result = getResponseAsStringBuilder(response);
@@ -103,7 +104,8 @@ public class RequestBuilder {
             HttpPut put = new HttpPut(baseUrl + url);
 
             put.setHeader("Authorization", "Bearer " + generateAuthHeader());
-            put.setEntity(new ByteArrayEntity(body.getBytes()));
+            put.addHeader("content-type", "application/json");
+            put.setEntity(new StringEntity(body));
 
             HttpResponse response = client.execute(put);
             StringBuilder result = getResponseAsStringBuilder(response);
