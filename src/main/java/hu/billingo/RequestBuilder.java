@@ -30,11 +30,13 @@ public class RequestBuilder {
     public String privateKey = "";
     public int leeway = 60;
     public String baseUrl = "https://www.billingo.hu/api";
+    public Long correctionMilis = 0L;
 
-    public RequestBuilder(String publicKey, String privateKey, String requesterUrl) {
+    public RequestBuilder(String publicKey, String privateKey, String requesterUrl, Long correctionMilis) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
         this.requesterUrl = requesterUrl;
+        this.correctionMilis = correctionMilis;
     }
 
     public <A extends ApiResponseWithStatus> A get(String url, TypeReference<A> var1) throws BillingoException {
@@ -143,7 +145,7 @@ public class RequestBuilder {
 
     public String generateAuthHeader() throws NoSuchAlgorithmException {
         String secret = new String(Base64.encodeBase64(privateKey.getBytes()));
-        Long time = System.currentTimeMillis() / 1000;
+        Long time = (System.currentTimeMillis() + correctionMilis) / 1000;
         String iss = requesterUrl;
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("sub", publicKey);

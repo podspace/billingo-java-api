@@ -11,7 +11,11 @@ public class Billingo {
     public RequestBuilder requester;
 
     public Billingo(String publicKey, String privateKey, String requesterUrl) {
-        this.requester = new RequestBuilder(publicKey, privateKey, requesterUrl);
+        this.requester = new RequestBuilder(publicKey, privateKey, requesterUrl, 0L);
+    }
+
+    public Billingo(String publicKey, String privateKey, String requesterUrl, Long correctionMilis) {
+        this.requester = new RequestBuilder(publicKey, privateKey, requesterUrl, correctionMilis);
     }
 
     public List<ResponseData<BankAccount>> getBankAccounts() throws BillingoException {
@@ -91,13 +95,10 @@ public class Billingo {
         }).data;
     }
 
-    /*
-    public List<ResponseData<Invoice>> getInvoicess() {
-        String jsonString = requester.get("/invoices");
-        return Json.fromJson(jsonString, new TypeReference<APIResponseList<ResponseData<Invoice>>>() {
+    public List<ResponseData<Invoice>> getInvoices() throws BillingoException {
+        return requester.get("/invoices", new TypeReference<APIResponseList<ResponseData<Invoice>>>() {
         }).data;
     }
-    */
     public ResponseData<Invoice> getInvoiceById(Long id) throws BillingoException {
         return requester.get("/invoices/" + id, new TypeReference<APIResponseSingle<ResponseData<Invoice>>>() {
         }).data;
@@ -133,8 +134,8 @@ public class Billingo {
     public void getInvoiceBlocks(Long id) {
     }
 
-    public List<ResponseData<PaymentMethods>> getPaymentMethods(String langcode) throws BillingoException {
-        return requester.get("/payment_methods/" + langcode, new TypeReference<APIResponseList<ResponseData<PaymentMethods>>>() {
+    public List<ResponseData<PaymentMethod>> getPaymentMethods(String langcode) throws BillingoException {
+        return requester.get("/payment_methods/" + langcode, new TypeReference<APIResponseList<ResponseData<PaymentMethod>>>() {
         }).data;
     }
 
