@@ -79,7 +79,7 @@ public class RequestBuilder {
 
             post.setHeader("Authorization", "Bearer " + generateAuthHeader());
             post.addHeader("content-type", "application/json");
-            post.setEntity(new StringEntity(body));
+            post.setEntity(new StringEntity(body, "UTF-8"));
 
             HttpResponse response = client.execute(post);
             StringBuilder result = getResponseAsStringBuilder(response);
@@ -110,7 +110,7 @@ public class RequestBuilder {
 
             put.setHeader("Authorization", "Bearer " + generateAuthHeader());
             put.addHeader("content-type", "application/json");
-            put.setEntity(new StringEntity(body));
+            put.setEntity(new StringEntity(body, "UTF-8"));
 
             HttpResponse response = client.execute(put);
             StringBuilder result = getResponseAsStringBuilder(response);
