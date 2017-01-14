@@ -49,6 +49,7 @@ public class RequestBuilder {
             HttpResponse response = client.execute(get);
             StringBuilder result = getResponseAsStringBuilder(response);
             A retval = Json.fromJson(result.toString(), var1);
+            System.out.println("Billingo response: " + result.toString());
             checkResponseObject((A) retval);
             return retval;
         } catch(NoSuchAlgorithmException e) {
@@ -82,6 +83,8 @@ public class RequestBuilder {
 
             HttpResponse response = client.execute(post);
             StringBuilder result = getResponseAsStringBuilder(response);
+            System.out.println("Billingo request: " + body);
+            System.out.println("Billingo response: " + result.toString());
             A retval = Json.fromJson(result.toString(), var1);
             checkResponseObject(retval);
             return retval;
@@ -111,6 +114,8 @@ public class RequestBuilder {
 
             HttpResponse response = client.execute(put);
             StringBuilder result = getResponseAsStringBuilder(response);
+            System.out.println("Billingo request: " + body);
+            System.out.println("Billingo response: " + result.toString());
             A retval = Json.fromJson(result.toString(), var1);
             checkResponseObject((A) retval);
             return retval;
@@ -131,6 +136,7 @@ public class RequestBuilder {
             delete.setHeader("Authorization", "Bearer " + generateAuthHeader());
             HttpResponse response = client.execute(delete);
             StringBuilder result = getResponseAsStringBuilder(response);
+            System.out.println("Billingo response: " + result.toString());
             APIResponseStatusOnly status = Json.fromJson(result.toString(), new TypeReference<APIResponseStatusOnly>() {
             });
             checkResponseObject(status);
