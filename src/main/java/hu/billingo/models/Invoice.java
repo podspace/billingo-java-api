@@ -24,7 +24,8 @@ import java.util.Map;
     "template_lang_code",
     "type",
     "exchange_rate",
-    "items"
+    "items",
+    "invoice_no"
 })
 public class Invoice {
 
@@ -106,6 +107,9 @@ public class Invoice {
      */
     @JsonProperty("items")
     public List<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
+
+    @JsonProperty("invoice_no")
+    public String invoiceNo;
 
     @Generated("org.jsonschema2pojo")
     public enum ElectronicInvoice {
